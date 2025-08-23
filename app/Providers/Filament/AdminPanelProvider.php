@@ -35,6 +35,10 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('50px')
             ->sidebarWidth('18rem')
             ->collapsedSidebarWidth('9rem')
+            ->renderHook(
+                'panels::head.end',
+                fn(): string => view('partials.meta')->render()
+            )
             ->assets([
                 Css::make('custom-style', asset('css/custom-filament.css')),
             ])
