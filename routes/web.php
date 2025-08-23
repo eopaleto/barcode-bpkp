@@ -5,9 +5,9 @@ use App\Http\Controllers\PergiController;
 use App\Http\Controllers\PulangController;
 use App\Http\Controllers\BarcodeController;
 
-Route::get('/', function () {
-    return redirect('/barcode');
-});
+// Route::get('/', function () {
+//     return redirect('/barcode');
+// });
 
 Route::get('/barcode/print/pergi/{pergi}', [BarcodeController::class, 'printPergi'])->name('barcode.print.pergi');
 Route::get('/barcode/print/pulang/{pulang}', [BarcodeController::class, 'printPulang'])->name('barcode.print.pulang');
