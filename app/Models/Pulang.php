@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Pegawai;
 use Milon\Barcode\DNS2D;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManagerStatic as Image;
 
 /**
@@ -67,13 +68,27 @@ class Pulang extends Model
             });
 
             $fileName = 'BRG_' . $pulang->id . '.png';
-            $canvas->save(storage_path("app/public/koper/pulang/{$fileName}"));
+            $canvas->save(storage_path("app/public/barcode/pulang/{$fileName}"));
 
             $pulang->updateQuietly([
                 'barcode' => $fileName,
                 'kode' => $kodeUnik,
                 'status' => '0',
             ]);
+        });
+
+        static::deleted(function ($pulang) {
+            if ($pulang->barcode && Storage::disk('public')->exists('barcode/pulang/' . $pulang->barcode)) {
+                Storage::disk('public')->delete('barcode/pulang/' . $pulang->barcode);
+            }
+
+            if ($pulang->foto_koper) {
+                foreach ($pulang->foto_koper as $foto) {
+                    if (Storage::disk('public')->exists($foto)) {
+                        Storage::disk('public')->delete($foto);
+                    }
+                }
+            }
         });
     }
 

@@ -44,11 +44,4 @@ class BarcodeController extends Controller
 
         return view('barcode.print-pulang', compact('pulang', 'barcodes'));
     }
-
-    public function show($kode)
-    {
-        $pergi = Pergi::with('pegawai')->where('kode', $kode)->firstOrFail();
-
-        return response()->json($pergi);
-    }
 }

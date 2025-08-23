@@ -56,11 +56,21 @@ class PergiResource extends Resource
 
                 TextInput::make('nama')
                     ->label('Nama Lengkap')
-                    ->readOnly(),
+                    ->readOnly()
+                    ->afterStateHydrated(function ($set, $record) {
+                        if ($record?->pegawai) {
+                            $set('nama', $record->pegawai->nama);
+                        }
+                    }),
 
                 TextInput::make('unit_kerja')
                     ->label('Unit Kerja')
-                    ->readOnly(),
+                    ->readOnly()
+                    ->afterStateHydrated(function ($set, $record) {
+                        if ($record?->pegawai) {
+                            $set('unit_kerja', $record->pegawai->unit_kerja);
+                        }
+                    }),
 
                 TextInput::make('jumlah_koper')
                     ->label('Jumlah Koper')
@@ -72,7 +82,8 @@ class PergiResource extends Resource
                     ->label('Foto Koper')
                     ->image()
                     ->multiple()
-                    ->directory('koper'),
+                    ->directory('koper/pergi')
+                    ->preserveFilenames(),
             ]);
     }
 
@@ -90,8 +101,8 @@ class PergiResource extends Resource
                 ImageColumn::make('barcode')
                     ->label('Barcode')
                     ->disk('public')
-                    ->getStateUsing(fn($record) => 'koper/pergi/' . $record->barcode)
-                    ->size('400'),
+                    ->getStateUsing(fn($record) => 'barcode/pergi/' . $record->barcode)
+                    ->size('150'),
                 TextColumn::make('status')
                     ->label('Status')
                     ->icon(fn($record) => match ((int) $record->status) {

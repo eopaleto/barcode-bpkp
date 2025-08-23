@@ -10,7 +10,7 @@ class ScanBarcode extends Page
     protected static ?string $navigationIcon = 'heroicon-o-qr-code';
     protected static ?string $slug = 'ScanBarcode';
     protected static ?string $navigationLabel = 'Scan Barcode';
-    protected static ?string $navigationGroup= 'Admin';
+    protected static ?string $navigationGroup= 'Operator';
     protected static string $view = 'filament.pages.scan-barcode';
 
     public static function canAccess(): bool
