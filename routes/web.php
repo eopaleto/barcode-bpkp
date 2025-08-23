@@ -9,7 +9,8 @@ Route::get('/', function () {
     return redirect('/barcode');
 });
 
-Route::get('/barcode/print/{pergi}', [BarcodeController::class, 'print'])->name('barcode.print');
+Route::get('/barcode/print/pergi/{pergi}', [BarcodeController::class, 'printPergi'])->name('barcode.print.pergi');
+Route::get('/barcode/print/pulang/{pulang}', [BarcodeController::class, 'printPulang'])->name('barcode.print.pulang');
 
 Route::prefix('api')->group(function () {
     Route::get('/pergi/{kode}', [BarcodeController::class, 'show']);

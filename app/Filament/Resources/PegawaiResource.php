@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
 use Filament\Tables;
 use App\Models\Pegawai;
 use Filament\Forms\Form;
@@ -11,15 +10,14 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Traits\SuperAdminReadOnly;
 use App\Filament\Resources\PegawaiResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PegawaiResource\RelationManagers;
 
 class PegawaiResource extends Resource
 {
-    protected static ?string $model = Pegawai::class;
+    use SuperAdminReadOnly;
 
+    protected static ?string $model = Pegawai::class;
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $slug = 'Pegawai';
     protected static ?string $navigationGroup = 'Admin';
@@ -64,11 +62,15 @@ class PegawaiResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+        ->bulkActions(
+            auth()->user()->hasRole('SuperAdmin')
+                ? []
+                : [
+                    Tables\Actions\BulkActionGroup::make([
+                        Tables\Actions\DeleteBulkAction::make(),
+                    ]),
+                ]
+        );
     }
 
     public static function canAccess(): bool
@@ -76,7 +78,7 @@ class PegawaiResource extends Resource
         /** @var User|null $user */
         $user = Auth::user();
 
-        return $user?->hasRole('Admin');
+        return $user?->hasAnyRole(['SuperAdmin', 'Admin']);
     }
 
     public static function getRelations(): array

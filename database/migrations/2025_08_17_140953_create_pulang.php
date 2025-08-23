@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('jumlah_koper');
             $table->json('foto_koper')->nullable();
             $table->text('barcode')->nullable();
+            $table->text('kode')->nullable();
             $table->text('status')->nullable();
             $table->timestamps();
         });

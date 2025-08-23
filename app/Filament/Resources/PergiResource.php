@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
 use Filament\Tables;
 use App\Models\Pergi;
 use Filament\Forms\Form;
@@ -15,8 +14,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
 use App\Filament\Resources\PergiResource\Pages;
 
 class PergiResource extends Resource
@@ -93,7 +90,7 @@ class PergiResource extends Resource
                 ImageColumn::make('barcode')
                     ->label('Barcode')
                     ->disk('public')
-                    ->getStateUsing(fn($record) => 'koper/' . $record->barcode)
+                    ->getStateUsing(fn($record) => 'koper/pergi/' . $record->barcode)
                     ->size('400'),
                 TextColumn::make('status')
                     ->label('Status')
@@ -118,16 +115,20 @@ class PergiResource extends Resource
                     ->icon('heroicon-m-printer')
                     ->color('success')
                     ->label('Cetak')
-                    ->url(fn($record) => route('barcode.print', $record->id))
+                    ->url(fn($record) => route('barcode.print.pergi', $record->id))
                     ->openUrlInNewTab(),
                 Tables\Actions\DeleteAction::make(),
 
             ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->bulkActions(
+                auth()->user()->hasRole('SuperAdmin')
+                    ? []
+                    : [
+                        Tables\Actions\BulkActionGroup::make([
+                            Tables\Actions\DeleteBulkAction::make(),
+                        ]),
+                    ]
+            );
     }
 
     public static function canAccess(): bool
@@ -135,7 +136,7 @@ class PergiResource extends Resource
         /** @var User|null $user */
         $user = Auth::user();
 
-        return $user?->hasRole('Operator');
+        return $user?->hasAnyRole(['Operator', 'SuperAdmin']);
     }
 
     public static function getRelations(): array

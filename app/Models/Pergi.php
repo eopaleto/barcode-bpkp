@@ -7,6 +7,9 @@ use Milon\Barcode\DNS2D;
 use Illuminate\Database\Eloquent\Model;
 use Intervention\Image\ImageManagerStatic as Image;
 
+/**
+ * @mixin IdeHelperPergi
+ */
 class Pergi extends Model
 {
     protected $table = 'pergi';
@@ -57,8 +60,14 @@ class Pergi extends Model
                 $font->align('left');
             });
 
+            $canvas->text("Barcode untuk Pergi", 150, 125, function ($font) {
+                $font->size(12);
+                $font->color('#FF0000');
+                $font->align('left');
+            });
+
             $fileName = 'BRG_' . $pergi->id . '.png';
-            $canvas->save(storage_path("app/public/koper/{$fileName}"));
+            $canvas->save(storage_path("app/public/koper/pergi/{$fileName}"));
 
             $pergi->updateQuietly([
                 'barcode' => $fileName,

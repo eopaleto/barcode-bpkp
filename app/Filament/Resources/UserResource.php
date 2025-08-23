@@ -11,12 +11,14 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use App\Filament\Traits\SuperAdminReadOnly;
 use App\Filament\Resources\UserResource\Pages;
 
 class UserResource extends Resource
 {
-    protected static ?string $model = User::class;
+    use SuperAdminReadOnly;
 
+    protected static ?string $model = User::class;
     protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static ?string $slug = 'UserManagement';
     protected static ?string $navigationGroup = 'Admin';
@@ -71,9 +73,15 @@ class UserResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ->bulkActions(
+                auth()->user()->hasRole('SuperAdmin')
+                    ? []
+                    : [
+                        Tables\Actions\BulkActionGroup::make([
+                            Tables\Actions\DeleteBulkAction::make(),
+                        ]),
+                    ]
+            );
     }
 
     public static function canAccess(): bool
@@ -81,7 +89,7 @@ class UserResource extends Resource
         /** @var User|null $user */
         $user = Auth::user();
 
-        return $user?->hasRole('Admin');
+        return $user?->hasAnyRole(['SuperAdmin', 'Admin']);
     }
 
     public static function getRelations(): array

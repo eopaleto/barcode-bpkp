@@ -2,7 +2,10 @@
 <html>
 
 <head>
-    <title>Cetak Barcode Koper</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Pulang - {{ $pulang->pegawai->nama ?? 'Pegawai' }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <style>
         @page {
             size: 100mm auto;
@@ -36,7 +39,6 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            /* pakai cover kalau mau penuh potong */
         }
     </style>
 </head>
@@ -45,7 +47,7 @@
     <div class="container">
         @foreach ($barcodes as $item)
             <div class="sticker">
-                <img src="{{ asset($item['barcode']) }}" alt="barcode">
+                <img src="{{ asset('storage/koper/pulang/' . $pulang->barcode) }}" alt="barcode">
             </div>
         @endforeach
     </div>
