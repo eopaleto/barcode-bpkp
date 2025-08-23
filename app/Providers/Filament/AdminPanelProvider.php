@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('barcode')
+            ->path('')
             ->login()
             ->brandLogo(asset('img/logo-bpkp.png'))
             ->brandLogoHeight('50px')
