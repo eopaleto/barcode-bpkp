@@ -6,21 +6,23 @@ use Filament\Tables;
 use App\Models\Pulang;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\Action;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Actions\CreateAction;
+use App\Filament\Traits\SuperAdminReadOnly;
 use App\Filament\Resources\PulangResource\Pages;
 
 class PulangResource extends Resource
 {
+    use SuperAdminReadOnly;
     protected static ?string $model = Pulang::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-arrow-down';
+    protected static ?string $navigationIcon = 'heroicon-o-arrow-uturn-left';
     protected static ?string $slug = 'Pulang';
     protected static ?string $navigationGroup = 'Operator';
 
@@ -82,6 +84,7 @@ class PulangResource extends Resource
                 FileUpload::make('foto_koper')
                     ->label('Foto Koper')
                     ->image()
+                    ->required()
                     ->multiple()
                     ->directory('koper/pulang'),
             ]);
@@ -94,15 +97,34 @@ class PulangResource extends Resource
                 TextColumn::make('id')->rowIndex()->label('No'),
                 TextColumn::make('pegawai.nip_baru')->label('NIP'),
                 TextColumn::make('pegawai.nama')->label('Nama'),
-                TextColumn::make('pegawai.jabatan')->label('Jabatan'),
                 TextColumn::make('pegawai.unit_kerja')->label('Unit Kerja'),
                 TextColumn::make('jumlah_koper')->label('Jumlah Koper'),
                 TextColumn::make('created_at')->label('Dibuat')->dateTime(),
-                ImageColumn::make('barcode')
-                    ->label('Barcode')
-                    ->disk('public')
-                    ->getStateUsing(fn($record) => 'barcode/pulang/' . $record->barcode)
-                    ->size('150'),
+                TextColumn::make('foto_koper')
+                    ->label('Foto Koper')
+                    ->formatStateUsing(function ($state) {
+                        return empty($state) ? 'Tidak ada foto' : 'Lihat Preview';
+                    })
+                    ->icon('heroicon-o-eye')
+                    ->color('success')
+                    ->action(
+                        Tables\Actions\Action::make('preview')
+                            ->label('Lihat Preview')
+                            ->icon('heroicon-o-eye')
+                            ->color('success')
+                            ->modalHeading('Preview Foto Koper')
+                            ->modalWidth('4xl')
+                            ->modalContent(
+                                fn($record) =>
+                                view('filament.preview-foto', [
+                                    'fotos' => is_array($record->foto_koper)
+                                        ? $record->foto_koper
+                                        : json_decode($record->foto_koper, true),
+                                ])
+                            )
+                            ->modalSubmitAction(false)
+                            ->modalCancelAction(false)
+                    ),
                 TextColumn::make('status')
                     ->label('Status')
                     ->icon(fn($record) => match ((int) $record->status) {
@@ -121,7 +143,7 @@ class PulangResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
+            ->actions(auth()->user()->hasRole('SuperAdmin') ? [] : [
                 Action::make('cetak')
                     ->icon('heroicon-m-printer')
                     ->color('success')
@@ -132,13 +154,11 @@ class PulangResource extends Resource
 
             ])
             ->bulkActions(
-                auth()->user()->hasRole('SuperAdmin')
-                    ? []
-                    : [
-                        Tables\Actions\BulkActionGroup::make([
-                            Tables\Actions\DeleteBulkAction::make(),
-                        ]),
-                    ]
+                auth()->user()->hasRole('SuperAdmin') ? [] : [
+                    Tables\Actions\BulkActionGroup::make([
+                        Tables\Actions\DeleteBulkAction::make(),
+                    ]),
+                ]
             );
     }
 

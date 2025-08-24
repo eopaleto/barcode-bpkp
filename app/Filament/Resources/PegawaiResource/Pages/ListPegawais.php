@@ -13,7 +13,9 @@ class ListPegawais extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label('Tambah Pegawai Baru')
+                ->icon('heroicon-o-plus')
         ];
     }
 }

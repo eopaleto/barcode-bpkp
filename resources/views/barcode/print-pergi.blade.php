@@ -9,7 +9,6 @@
     <style>
         @page {
             size: 100mm auto;
-            /* lebar fix 100mm, tinggi menyesuaikan */
             margin: 5mm;
         }
 
@@ -20,15 +19,12 @@
         .barcode-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            /* 2 kolom */
             gap: 5mm;
         }
 
         .barcode-item {
             width: 50mm;
-            /* 5 cm */
             height: 50mm;
-            /* 5 cm */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -47,7 +43,7 @@
     <div class="container">
         @foreach ($barcodes as $item)
             <div class="sticker">
-                <img src="{{ asset('storage/koper/pergi/' . $pergi->barcode) }}" alt="barcode">
+                <img src="{{ asset('storage/barcode/pergi/' . $pergi->barcode) }}" alt="barcode">
             </div>
         @endforeach
     </div>
