@@ -86,11 +86,6 @@ class PulangResource extends Resource
                     ->image()
                     ->required()
                     ->multiple()
-                    ->acceptedFileTypes([
-                        'image/png',
-                        'image/jpeg',
-                        'image/heic',
-                    ])
                     ->directory('koper/pulang'),
             ]);
     }

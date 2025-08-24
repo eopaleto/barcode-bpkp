@@ -87,12 +87,6 @@ class PergiResource extends Resource
                     ->image()
                     ->required()
                     ->multiple()
-                    ->acceptedFileTypes([
-                        'image/png',
-                        'image/jpeg',
-                        'image/heic',
-                        'image/heif',
-                    ])
                     ->directory('koper/pergi'),
             ]);
     }
