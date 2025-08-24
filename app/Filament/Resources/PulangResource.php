@@ -83,6 +83,7 @@ class PulangResource extends Resource
 
                 FileUpload::make('foto_koper')
                     ->label('Foto Koper')
+                    ->maxSize(10240)
                     ->required()
                     ->multiple()
                     ->directory('koper/pulang'),
