@@ -91,6 +91,7 @@ class PergiResource extends Resource
                         'image/png',
                         'image/jpeg',
                         'image/heic',
+                        'image/heif',
                     ])
                     ->directory('koper/pergi'),
             ]);
