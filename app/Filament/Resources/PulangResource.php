@@ -4,9 +4,12 @@ namespace App\Filament\Resources;
 
 use Filament\Tables;
 use App\Models\Pulang;
+use App\Models\Pegawai;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
@@ -16,6 +19,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Actions\CreateAction;
 use App\Filament\Traits\SuperAdminReadOnly;
+use Illuminate\Validation\ValidationException;
 use App\Filament\Resources\PulangResource\Pages;
 
 class PulangResource extends Resource
@@ -30,63 +34,70 @@ class PulangResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('pegawai_id')
-                    ->label('NIP')
-                    ->relationship(
-                        name: 'pegawai',
-                        titleAttribute: 'nip_baru',
-                        modifyQueryUsing: fn($query) => $query->where(function ($q) {
-                            $search = request('search');
-                            if ($search) {
-                                $q->where('nip_lama', 'like', "%{$search}%")
-                                    ->orWhere('nip_baru', 'like', "%{$search}%")
-                                    ->orWhere('nama', 'like', "%{$search}%");
-                            }
-                        }),
-                    )
-                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->nip_baru}")
-                    ->searchable()
-                    ->reactive()
-                    ->afterStateUpdated(
-                        fn($state, callable $set) =>
-                        $set('nama', \App\Models\Pegawai::find($state)?->nama)
-                    )
-                    ->afterStateUpdated(
-                        fn($state, callable $set) =>
-                        $set('unit_kerja', \App\Models\Pegawai::find($state)?->unit_kerja)
-                    )
-                    ->required(),
+                Card::make([
+                    Grid::make()
+                        ->schema([
 
-                TextInput::make('nama')
-                    ->label('Nama Lengkap')
-                    ->readOnly()
-                    ->afterStateHydrated(function ($set, $record) {
-                        if ($record?->pegawai) {
-                            $set('nama', $record->pegawai->nama);
-                        }
-                    }),
+                            Select::make('pegawai_id')
+                                ->label('NIP')
+                                ->relationship(
+                                    name: 'pegawai',
+                                    titleAttribute: 'nip_baru',
+                                    modifyQueryUsing: fn($query) => $query->where(function ($q) {
+                                        $search = request('search');
+                                        if ($search) {
+                                            $q->where('nip_lama', 'like', "%{$search}%")
+                                                ->orWhere('nip_baru', 'like', "%{$search}%")
+                                                ->orWhere('nama', 'like', "%{$search}%");
+                                        }
+                                    }),
+                                )
+                                ->getOptionLabelFromRecordUsing(fn($record) => "{$record->nip_baru}")
+                                ->searchable()
+                                ->reactive()
+                                ->afterStateUpdated(
+                                    fn($state, callable $set) =>
+                                    $set('nama', Pegawai::find($state)?->nama)
+                                )
+                                ->afterStateUpdated(
+                                    fn($state, callable $set) =>
+                                    $set('unit_kerja', Pegawai::find($state)?->unit_kerja)
+                                )
+                                ->required(),
 
-                TextInput::make('unit_kerja')
-                    ->label('Unit Kerja')
-                    ->readOnly()
-                    ->afterStateHydrated(function ($set, $record) {
-                        if ($record?->pegawai) {
-                            $set('unit_kerja', $record->pegawai->unit_kerja);
-                        }
-                    }),
+                            TextInput::make('nama')
+                                ->label('Nama Lengkap')
+                                ->readOnly()
+                                ->afterStateHydrated(function ($set, $record) {
+                                    if ($record?->pegawai) {
+                                        $set('nama', $record->pegawai->nama);
+                                    }
+                                }),
 
-                TextInput::make('jumlah_koper')
-                    ->label('Jumlah Koper')
-                    ->numeric()
-                    ->reactive()
-                    ->required(),
+                            TextInput::make('unit_kerja')
+                                ->label('Unit Kerja')
+                                ->readOnly()
+                                ->afterStateHydrated(function ($set, $record) {
+                                    if ($record?->pegawai) {
+                                        $set('unit_kerja', $record->pegawai->unit_kerja);
+                                    }
+                                }),
 
-                FileUpload::make('foto_koper')
-                    ->label('Foto Koper')
-                    ->maxSize(10240)
-                    ->required()
-                    ->multiple()
-                    ->directory('koper/pulang'),
+                            TextInput::make('jumlah_koper')
+                                ->label('Jumlah Koper')
+                                ->numeric()
+                                ->reactive()
+                                ->required(),
+
+                            FileUpload::make('foto_koper')
+                                ->label('Foto Koper')
+                                ->maxSize(10240)
+                                ->required()
+                                ->multiple()
+                                ->directory('koper/pulang')
+                                ->reactive()
+                        ]),
+                ]),
             ]);
     }
 

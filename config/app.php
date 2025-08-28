@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('Barcode BPKP', 'Laravel'),
+    'name' => env('Barcode BPKP', 'Event BPKP'),
 
     /*
     |--------------------------------------------------------------------------
